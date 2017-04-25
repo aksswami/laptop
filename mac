@@ -168,7 +168,7 @@ else
 fi
 
 fancy_echo "Installing formulas and casks from the Brewfile ..."
-if brew bundle --file="$HOME/Brewfile"; then
+if brew bundle --file="$HOME/Document/workspace/laptop/Brewfile"; then
   fancy_echo "All formulas and casks were installed successfully."
 else
   fancy_echo "Some formulas or casks failed to install."
@@ -182,43 +182,48 @@ append_to_file "$shell_file" 'eval "$(hub alias -s)"'
 append_to_file "$HOME/.gemrc" 'gem: --no-document'
 
 if command -v rbenv >/dev/null || command -v rvm >/dev/null; then
-  fancy_echo 'We recommend chruby and ruby-install over RVM or rbenv'
+  rbenv_version = rbenv --version
+  fancy_echo $rbenv_version
 else
-  if ! brew_is_installed "chruby"; then
-    fancy_echo 'Installing chruby, ruby-install, and the latest Ruby...'
-
-    brew bundle --file=- <<EOF
-    brew 'chruby'
-    brew 'ruby-install'
-EOF
-
-    append_to_file "$shell_file" 'source /usr/local/share/chruby/chruby.sh'
-    append_to_file "$shell_file" 'source /usr/local/share/chruby/auto.sh'
-
-    ruby-install ruby
-
-    append_to_file "$shell_file" "chruby ruby-$(latest_installed_ruby)"
-
-    switch_to_latest_ruby
-  else
-    brew bundle --file=- <<EOF
-    brew 'chruby'
-    brew 'ruby-install'
-EOF
-    fancy_echo 'Checking if a newer version of Ruby is available...'
-    switch_to_latest_ruby
-
-    ruby-install --latest > /dev/null
-    latest_stable_ruby="$(cat < "$HOME/.cache/ruby-install/ruby/stable.txt" | tail -n1)"
-
-    if ! [ "$latest_stable_ruby" = "$(latest_installed_ruby)" ]; then
-      fancy_echo "Installing latest stable Ruby version: $latest_stable_ruby"
-      ruby-install ruby
-    else
-      fancy_echo 'You have the latest version of Ruby'
-    fi
-  fi
+  ruby_version = rbenv install -l | grep -v - | tail -1
+  rbenv "$ruby_version"
 fi
+# else
+#   if ! brew_is_installed "chruby"; then
+#     fancy_echo 'Installing chruby, ruby-install, and the latest Ruby...'
+#
+#     brew bundle --file=- <<EOF
+#     brew 'chruby'
+#     brew 'ruby-install'
+# EOF
+#
+#     append_to_file "$shell_file" 'source /usr/local/share/chruby/chruby.sh'
+#     append_to_file "$shell_file" 'source /usr/local/share/chruby/auto.sh'
+#
+#     ruby-install ruby
+#
+#     append_to_file "$shell_file" "chruby ruby-$(latest_installed_ruby)"
+#
+#     switch_to_latest_ruby
+#   else
+#     brew bundle --file=- <<EOF
+#     brew 'chruby'
+#     brew 'ruby-install'
+# EOF
+#     fancy_echo 'Checking if a newer version of Ruby is available...'
+#     switch_to_latest_ruby
+#
+#     ruby-install --latest > /dev/null
+#     latest_stable_ruby="$(cat < "$HOME/.cache/ruby-install/ruby/stable.txt" | tail -n1)"
+#
+#     if ! [ "$latest_stable_ruby" = "$(latest_installed_ruby)" ]; then
+#       fancy_echo "Installing latest stable Ruby version: $latest_stable_ruby"
+#       ruby-install ruby
+#     else
+#       fancy_echo 'You have the latest version of Ruby'
+#     fi
+#   fi
+# fi
 
 fancy_echo 'Updating Rubygems...'
 gem update --system
