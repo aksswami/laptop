@@ -2,8 +2,11 @@ cask_args appdir: '/Applications'
 
 brew 'git'
 brew 'rbenv'
+brew 'node'
+brew 'cocoapods'
+brew 'carthage'
 # brew 'heroku-toolbelt'
-
+tap 'caskroom/cask'
 tap 'homebrew/services'
 cask 'fastlane'
 cask 'atom'
