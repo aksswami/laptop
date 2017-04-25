@@ -168,7 +168,7 @@ else
 fi
 
 fancy_echo "Installing formulas and casks from the Brewfile ..."
-if brew bundle --file="$HOME/Document/workspace/laptop/Brewfile"; then
+if brew bundle --file="$HOME/Brewfile"; then
   fancy_echo "All formulas and casks were installed successfully."
 else
   fancy_echo "Some formulas or casks failed to install."
