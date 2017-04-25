@@ -1,6 +1,6 @@
 Laptop
 ======
-[![Build Status](https://travis-ci.org/monfresh/laptop.svg)](https://travis-ci.org/monfresh/laptop)
+<!-- [![Build Status](https://travis-ci.org/monfresh/laptop.svg)](https://travis-ci.org/monfresh/laptop) -->
 
 Laptop is a script to set up an OS X computer for web development, and to keep
 it up to date.
@@ -39,10 +39,10 @@ and once it appears, press `return` to launch it.
 In your Terminal window, copy and paste the command below, then press `return`.
 
 ```sh
-bash <(curl -s https://raw.githubusercontent.com/monfresh/laptop/master/laptop)
+bash <(curl -s https://raw.githubusercontent.com/aksswami/laptop/master/laptop)
 ```
 
-The [script](https://github.com/monfresh/laptop/blob/master/mac) itself is
+The [script](https://github.com/aksswami/laptop/blob/master/mac) itself is
 available in this repo for you to review if you want to see what it does
 and how it works.
 
@@ -69,7 +69,7 @@ Debugging
 Your last Laptop run will be saved to a file called `laptop.log` in your home
 folder. Read through it to see if you can debug the issue yourself. If not,
 copy the entire contents of `laptop.log` into a
-[new GitHub Issue](https://github.com/monfresh/laptop/issues/new) for me.
+[new GitHub Issue](https://github.com/aksswami/laptop/issues/new) for me.
 Or, attach the whole log file as an attachment.
 
 What it sets up
@@ -155,8 +155,8 @@ Customize in `~/.laptop.local` and `~/Brewfile.local`
 cd ~
 
 # Download the sample files to your computer
-curl --remote-name https://raw.githubusercontent.com/monfresh/laptop/master/.laptop.local
-curl --remote-name https://raw.githubusercontent.com/monfresh/laptop/master/Brewfile.local
+curl --remote-name https://raw.githubusercontent.com/aksswami/laptop/master/.laptop.local
+curl --remote-name https://raw.githubusercontent.com/aksswami/laptop/master/Brewfile.local
 
 # open the files in Sublime Text
 subl .laptop.local
