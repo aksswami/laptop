@@ -131,6 +131,20 @@ switch_to_latest_ruby() {
 }
 
 install_dotfile() {
+  if [ ! -d "$HOME/.dotfiles" ]; then
+    clone_and_execute_dotfile
+  else
+    echo "Removing existing dotfiles and installing new."
+    echo -n "Press ${bold}y${normal} to continue, ${bold}n${normal} to skip: "
+    read -r -n 1 response
+    if [ "$response" = "y" ]; then
+      rm -rf "$HOME/.dotfiles"
+      clone_and_execute_dotfile
+    fi
+  fi
+}
+
+clone_and_execute_dotfile() {
   git clone "https://github.com/aksswami/dotfiles.git" "$HOME/.dotfiles"
   cd "$HOME/.dotfiles"
   script/bootstrap
