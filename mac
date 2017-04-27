@@ -132,6 +132,7 @@ switch_to_latest_ruby() {
 
 install_dotfile() {
   if [ ! -d "$HOME/.dotfiles" ]; then
+    fancy_echo "Installing .dotfile ..."
     clone_and_execute_dotfile
   else
     echo "Removing existing dotfiles and installing new."
@@ -146,7 +147,8 @@ install_dotfile() {
 
 install_oh_my_zsh() {
   if [ ! -d "$HOME/.oh-my-zsh" ]; then
-    clone_and_execute_dotfile
+    fancy_echo "Installing .oh-my-zsh ..."
+    clone_oh_my_zsh
   else
     echo "Removing existing oh-my-zsh and installing fresh."
     echo -n "Press ${bold}y${normal} to continue, ${bold}n${normal} to skip: "
@@ -217,19 +219,23 @@ fi
 # shellcheck disable=SC2016
 append_to_file "$shell_file" 'eval "$(hub alias -s)"'
 
-#Install dotfile
-install_dotfile
-install_oh_my_zsh
-
 append_to_file "$HOME/.gemrc" 'gem: --no-document'
 
-if command -v rbenv >/dev/null || command -v rvm >/dev/null; then
-  rbenv_version = rbenv --version
-  fancy_echo $rbenv_version
-else
-  ruby_version = rbenv install -l | grep -v - | tail -1
-  rbenv "$ruby_version"
-fi
+exists() {
+  command -v "$1" >/dev/null 2>&1
+}
+
+check_and_install_latest_ruby_version() {
+  if exists rbenv; then
+    fancy_echo "$(rbenv --version)"
+    local ruby_version="$(rbenv install -l | grep -v - | tail -1)"
+    echo "$ruby_version"
+    rbenv install "${ruby_version//[[:space:]]/}"
+  fi
+}
+
+check_and_install_latest_ruby_version
+
 # else
 #   if ! brew_is_installed "chruby"; then
 #     fancy_echo 'Installing chruby, ruby-install, and the latest Ruby...'
@@ -267,14 +273,14 @@ fi
 #   fi
 # fi
 
-fancy_echo 'Updating Rubygems...'
-gem update --system
-
-gem_install_or_update 'bundler'
-
-fancy_echo "Configuring Bundler ..."
-number_of_cores=$(sysctl -n hw.ncpu)
-bundle config --global jobs $((number_of_cores - 1))
+# fancy_echo 'Updating Rubygems...'
+# sudo gem update --system
+#
+# gem_install_or_update 'bundler'
+#
+# fancy_echo "Configuring Bundler ..."
+# number_of_cores=$(sysctl -n hw.ncpu)
+# bundle config --global jobs $((number_of_cores - 1))
 
 fancy_echo '...Finished Ruby installation checks.'
 
@@ -286,48 +292,13 @@ no_zsh_frameworks() {
   [ ! -d "$HOME/.oh-my-zsh" ] && [ ! -d "$HOME/.zpresto" ] && [ ! -d "$HOME/.zim" ] && [ ! -d "$HOME/.zplug" ]
 }
 
-if [ -z "$CI" ] && no_zsh_frameworks && no_prompt_customizations_in_shell_file; then
-  echo -n "Would you like to customize your prompt to display the current directory and ruby version? [y/n]: "
-  read -r -n 1 response
-  if [ "$response" = "y" ]; then
-    if ! grep -qs "prompt_ruby_info()" "$shell_file"; then
-      cat <<EOT >> "$shell_file"
-
-  prompt_ruby_info() {
-    if [ -f ".ruby-version" ]; then
-      cat .ruby-version
-    fi
-  }
-EOT
-    fi
-    # shellcheck disable=SC2016
-    append_to_file "$shell_file" 'GREEN=$(tput setaf 65)'
-    # shellcheck disable=SC2016
-    append_to_file "$shell_file" 'ORANGE=$(tput setaf 166)'
-    # shellcheck disable=SC2016
-    append_to_file "$shell_file" 'NORMAL=$(tput sgr0)'
-    # display pwd in orange, current ruby version in green,
-    # and set prompt character to $
-    # shellcheck disable=SC2016
-    append_to_file "$shell_file" 'precmd () { PS1="${ORANGE}[%~] ${GREEN}$(prompt_ruby_info) ${NORMAL}$ " }'
-    # display directories and files in different colors when running ls
-    append_to_file "$shell_file" 'export CLICOLOR=1;'
-    append_to_file "$shell_file" 'export LSCOLORS=exfxcxdxbxegedabagacad;'
-  else
-    fancy_echo "Skipping prompt customization."
-  fi
-fi
-
-if app_is_installed 'GitHub'; then
-  fancy_echo "It looks like you've already configured your GitHub SSH keys."
-  fancy_echo "If not, you can do it by signing in to the GitHub app on your Mac."
-elif [ ! -f "$HOME/.ssh/github_rsa.pub" ]; then
-  open ~/Applications/GitHub\ Desktop.app
-fi
-
 if [ -f "$HOME/.laptop.local" ]; then
   # shellcheck source=/dev/null
   . "$HOME/.laptop.local"
 fi
+
+#Install dotfile
+install_oh_my_zsh
+install_dotfile
 
 fancy_echo 'All done!'
