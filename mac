@@ -144,10 +144,28 @@ install_dotfile() {
   fi
 }
 
+install_oh_my_zsh() {
+  if [ ! -d "$HOME/.oh-my-zsh" ]; then
+    clone_and_execute_dotfile
+  else
+    echo "Removing existing oh-my-zsh and installing fresh."
+    echo -n "Press ${bold}y${normal} to continue, ${bold}n${normal} to skip: "
+    read -r -n 1 response
+    if [ "$response" = "y" ]; then
+      rm -rf "$HOME/.oh-my-zsh"
+      clone_oh_my_zsh
+    fi
+  fi
+}
+
 clone_and_execute_dotfile() {
   git clone "https://github.com/aksswami/dotfiles.git" "$HOME/.dotfiles"
   cd "$HOME/.dotfiles"
   script/bootstrap
+}
+
+clone_oh_my_zsh() {
+  git clone "git://github.com/robbyrussell/oh-my-zsh.git" "$HOME/.oh-my-zsh"
 }
 
 append_to_file "$shell_file" "alias laptop='bash <(curl -s https://raw.githubusercontent.com/monfresh/laptop/master/laptop)'"
@@ -201,6 +219,7 @@ append_to_file "$shell_file" 'eval "$(hub alias -s)"'
 
 #Install dotfile
 install_dotfile
+install_oh_my_zsh
 
 append_to_file "$HOME/.gemrc" 'gem: --no-document'
 
