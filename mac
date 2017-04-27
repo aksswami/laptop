@@ -130,6 +130,12 @@ switch_to_latest_ruby() {
   chruby "ruby-$(latest_installed_ruby)"
 }
 
+install_dotfile() {
+  git clone "https://github.com/aksswami/dotfiles.git" "$HOME/.dotfiles"
+  cd "$HOME/.dotfiles"
+  script/bootstrap
+}
+
 append_to_file "$shell_file" "alias laptop='bash <(curl -s https://raw.githubusercontent.com/monfresh/laptop/master/laptop)'"
 
 # shellcheck disable=SC2016
@@ -245,12 +251,6 @@ no_prompt_customizations_in_shell_file() {
 
 no_zsh_frameworks() {
   [ ! -d "$HOME/.oh-my-zsh" ] && [ ! -d "$HOME/.zpresto" ] && [ ! -d "$HOME/.zim" ] && [ ! -d "$HOME/.zplug" ]
-}
-
-install_dotfile() {
-  git clone "https://github.com/aksswami/dotfiles.git" "$HOME/.dotfiles"
-  cd "$HOME/.dotfiles"
-  script/bootstrap
 }
 
 if [ -z "$CI" ] && no_zsh_frameworks && no_prompt_customizations_in_shell_file; then
